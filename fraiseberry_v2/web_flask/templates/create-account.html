@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel='stylesheet' href="../static/create_account.css">
+
+		<title>Get started</title>
+	</head>
+
+
+
+		<body class="container">
+			<header>
+				<img class="header-item-img" src="../static/images/icon.png" alt="">
+				<h1 class="header-item">Fraiseberry</h1>
+			</header>
+			<main>
+
+		<div class="box">
+			<div class="label-box">
+				<p>Name</p>
+				<p>Last name</p>
+				<p>Date of birth</p>
+				<p>email</p>
+				<p>Username</p>
+				<p>Password</p>
+				<p>Gender</p>
+			</div>
+			<div class="input-box">
+				<input type="text" placeholder="enter your name" name="first_name">
+				<input type="text" placeholder="enter your last name" name="last_name">
+				<input type="date" placeholder="enter your date of birth" name="date_of_birth">
+				<input type="text" placeholder="example@example.com" name="email">
+				<input type="text" placeholder="enter a username" name="user_name">
+				<input type="password" name="password">
+				<select class="input" name="gender" id="gender">
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+					<option value="Non binary">Non binary</option>
+					<option value="Other">Other</option>
+				</select>
+
+
+			</div>
+		</div>
+
+				<button class="tweet-button" onclick="makeRequest()">Sign up</button>
+				<script>
+					function makeRequest() {
+
+						const form_data = {
+							first_name: document.querySelector('input[name="first_name"]').value,
+							last_name: document.querySelector('input[name="last_name"]').value,
+							date_of_birth: document.querySelector('input[name="date_of_birth"]').value,
+							email: document.querySelector('input[name="email"]').value,
+							user_name: document.querySelector('input[name="user_name"]').value,
+							user_password: document.querySelector('input[name="password"]').value,
+							gender: document.querySelector('#gender').value
+						};
+
+
+
+						fetch("/signup", {
+							method: "POST",
+							body: JSON.stringify(form_data),
+							headers: {"Content-Type": "application/json"}
+
+						})
+
+						.then(response => response.json())
+						.then(data => window.location.href = "/signin")
+						.catch(error => console.error('Error:', error));
+					}
+				</script>
+			</main>
+			<footer>
+
+			</footer>
+		</body>
+
+
+		</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel='stylesheet' href="../static/new_match_passive.css">
+		<script src="../static/dynamic/new_match_passive.js"></script>
+		<script src="https://cdn.lordicon.com/lordicon.js"></script>
+		<title>Get started</title>
+	</head>
+
+		<body class="container">
+			<header>
+				<lord-icon id="home"
+					src="https://cdn.lordicon.com/epietrpn.json"
+					trigger="hover"
+					style="width:70px;height:70px">
+				</lord-icon>
+			</header>
+
+			<main>
+				{% for name, pic in zipped %}
+				<div id="congrats">
+					<lord-icon
+						src="https://cdn.lordicon.com/cqofjexf.json"
+						trigger="loop"
+						delay="1000"
+						style="width:250px;height:250px">
+					</lord-icon>
+					<h3>Congratulations. You matched with {{ name }}</h3>
+				</div>
+
+					<div class="card">
+						<img src="../{{ pic }}" alt="" id="pp" data-pp="">
+					</div>
+
+					<div>
+						<p><a href="">Send a message</a> or <a href="/swipe/">continue your search</a></p>
+					</div>
+				{% endfor %}
+			</main>
+			<footer></footer>
+		</body>
+
+
+		</html>

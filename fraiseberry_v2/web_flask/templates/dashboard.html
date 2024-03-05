@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel='stylesheet' href="../static/dashboard.css">
+		<script src="../static/dynamic/dashboard.js"></script>
+		<script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+		<title>Fraiserry dashboard {{ user.user_name }}</title>
+	</head>
+
+
+
+		<body class="container">
+
+			<header>
+			</div>
+
+			<div class="fraise">
+				<img src="../static/images/icon.png" alt="">
+				<h1>Fraiseberry Home</h1>
+
+			</div>
+				<img src="../static/images/mailbox_icon.png" alt="" class="mail">
+			<div class="profilepic_icon">
+				<div class="popcontainter">
+					<lord-icon
+						src="https://cdn.lordicon.com/fmasbomy.json"
+						trigger="loop"
+						delay="5000"
+						style="width:50px;height:50px">
+					</lord-icon>
+					<button id="pp"></button>
+					<section id="popover">
+						<ul>
+							<li><a href="/" id="logout">Logout</a></li>
+							<li>logged in as {{ user.user_name }}</li>
+						</ul>
+					</section>
+				</div>
+			</div>
+
+
+			</header>
+			<main>
+				<div class="icon" id="camera">
+					<lord-icon
+						src="https://cdn.lordicon.com/bmlkvhui.json"
+						trigger="loop"
+						delay="5000"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="notifications">
+					<lord-icon
+						src="https://cdn.lordicon.com/nqisoomz.json"
+						trigger="hover"
+						style="width:80px;height:80px">
+					</lord-icon>
+			</main>
+			<footer>
+				<div class="icon" class="user" id="user_icon">
+					<lord-icon
+						src="https://cdn.lordicon.com/dvqeipeg.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="prefs">
+					<lord-icon
+						src="https://cdn.lordicon.com/zfzufhzk.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="message">
+					<lord-icon
+						src="https://cdn.lordicon.com/kiynvdns.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="heart">
+					<lord-icon
+						src="https://cdn.lordicon.com/igciyimj.json"
+						trigger="hover"
+						state="hover-match"
+						colors="primary:#121331,secondary:#e83a30,tertiary:#ffc738,quaternary:#f9c9c0,quinary:#f24c00,senary:#ebe6ef"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+			</footer>
+		</body>
+
+
+		</html>

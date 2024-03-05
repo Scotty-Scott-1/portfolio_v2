@@ -1,0 +1,110 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	background: linear-gradient(to bottom, #d6849c, #f3efe4);
+	height: auto;
+
+}
+
+header, main {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+
+}
+
+.header-item-img {
+	width: 50%;
+	max-width: 200px;;
+	margin-bottom: 10px;
+}
+
+.header-item {
+	margin-top: 0;
+	font-size: large;
+	font-family:'Courier New', Courier, monospace
+}
+
+main button {
+	margin-bottom: 10px;
+}
+
+main {
+	margin-top: 20px;
+}
+
+.tweet-button {
+	border-radius: 20px;
+	min-height: 50px;
+	min-width: 200px;
+	max-width: 60vw;
+}
+
+input {
+	margin-bottom: 10px;
+}
+
+
+@media only screen and (max-width: 600px) {
+	.header-item-img {
+		width: 50% ;
+		max-width: none;
+	}
+
+	.header-item {
+		font-size: medium;
+
+	}
+
+	.tweet-button {
+		max-width: 100%;
+	}
+
+
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-box input {
+	margin-left: 5px;
+}
+
+.box p {
+	margin-top: 0;
+	margin-bottom: 13px;
+}
+
+
+.label-box {
+	display: flex;
+	flex-direction: column;
+	margin-right: 7px;
+	margin-bottom: 50px;
+}
+
+.box{
+	display: flex;
+	flex-direction: row;
+}
+
+.input {
+	margin-top: 2px;
+	margin-bottom: 10px;
+	margin-left: 5px;
+}
+
+#bio {
+	min-height: 100px;
+	min-width: 70vw;
+}
+
+#bio_section {
+	display: block;
+	text-align: center;
+}

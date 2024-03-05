@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel='stylesheet' href="../static/style.css">
+
+		<title>Welcome to Fraiseberry</title>
+	</head>
+
+
+
+		<body class="container">
+			<header>
+				<img class="header-item-img" src="../static/images/icon.png" alt="">
+				<h1 class="header-item">Fraiseberry</h1>
+			</header>
+			<main>
+				<button class="tweet-button" id="sign-up-button">Sign up</button>
+				<br>
+				<button class="tweet-button" id="sign-in-button">Sign in</button>
+				<p class="main-item">Trouble logging in</p>
+
+				<script>
+					document.getElementById('sign-in-button').addEventListener('click', function() {
+						window.location.href = '/signin'
+					})
+					document.getElementById('sign-up-button').addEventListener('click', function() {
+					window.location.href = '/signup'
+					})
+				</script>
+
+			</main>
+			<footer></footer>
+		</body>
+
+
+		</html>

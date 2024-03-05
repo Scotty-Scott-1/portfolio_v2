@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+		<link rel='stylesheet' href="../static/view_matches.css">
+		<script src="../static/dynamic/view_matches.js"></script>
+		<script src="https://cdn.lordicon.com/lordicon.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+
+		<title>Fraiserry dashboard {{ user.user_name }}</title>
+	</head>
+
+
+
+		<body class="container">
+
+			<header>
+				<div>
+					<lord-icon id="home"
+						src="https://cdn.lordicon.com/epietrpn.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+
+
+			</header>
+			<main>
+				{% for candidate in result %}
+				<div class="card">
+					<img src="../{{ candidate.profile_pic_path }}" alt="" id="pp" data-pp="">
+					<p id="card_info_1" class="marck-script-regular">{{ candidate.first_name }}, {{ candidate.age }}</p>
+					<div id="icons">
+						<lord-icon
+							src="https://cdn.lordicon.com/xekbkxul.json"
+							trigger="morph"
+							state="morph-trash-in"
+							style="width:60px;height:60px">
+						</lord-icon>
+						<lord-icon
+						src="https://cdn.lordicon.com/kiynvdns.json"
+						trigger="hover"
+						style="width:60px;height:60px">
+					</lord-icon>
+				</div>
+
+				<div id="card_info">
+						<p id="card_info_2">@{{ candidate.user_name }}, {{ distance[candidate.user_name] }}km</p>
+						<p id="card_info_3">{{ candidate.bio }}</p>
+					</div>
+				</div>
+				{% endfor %}
+
+			</main>
+			<footer>
+				<div class="icon" class="user" id="user_icon">
+					<lord-icon
+						src="https://cdn.lordicon.com/dvqeipeg.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="prefs">
+					<lord-icon
+						src="https://cdn.lordicon.com/zfzufhzk.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon">
+					<lord-icon
+						src="https://cdn.lordicon.com/kiynvdns.json"
+						trigger="hover"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+				<div class="icon" id="heart">
+					<lord-icon
+						src="https://cdn.lordicon.com/igciyimj.json"
+						trigger="hover"
+						state="hover-match"
+						colors="primary:#121331,secondary:#e83a30,tertiary:#ffc738,quaternary:#f9c9c0,quinary:#f24c00,senary:#ebe6ef"
+						style="width:70px;height:70px">
+					</lord-icon>
+				</div>
+			</footer>
+		</body>
+
+
+		</html>
