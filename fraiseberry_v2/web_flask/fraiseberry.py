@@ -282,6 +282,10 @@ def swipe():
         for a in shuffled_list:
             print(a.user_name)
 
+        for a in shuffled_list[:]:
+            if a.user_name == user.user_name:
+                shuffled_list.remove(a)
+                print("user themself was in the list but removed")
 
         print("\n\n")
         session.close()
