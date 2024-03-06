@@ -103,6 +103,10 @@ footer .icon {
 	text-wrap: pretty;
 }
 
+.not_visable {
+	display: none;
+}
+
 .marck-script-regular {
 	font-family: "Marck Script", cursive;
 	font-weight: 400;

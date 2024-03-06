@@ -34,7 +34,7 @@
 					<img src="../{{ candidate.profile_pic_path }}" alt="" id="pp" data-pp="">
 					<p id="card_info_1" class="marck-script-regular">{{ candidate.first_name }}, {{ candidate.age }}</p>
 					<div id="icons">
-						<lord-icon
+						<lord-icon class="bin"
 							src="https://cdn.lordicon.com/xekbkxul.json"
 							trigger="morph"
 							state="morph-trash-in"
@@ -45,6 +45,7 @@
 						trigger="hover"
 						style="width:60px;height:60px">
 					</lord-icon>
+					<p class="not_visable">  {{ candidate.id }}</p>
 				</div>
 
 				<div id="card_info">

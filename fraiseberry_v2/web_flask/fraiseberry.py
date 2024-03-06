@@ -438,36 +438,60 @@ def new_match_passive():
         print("\n\n\n")
         return redirect(url_for("dashboard"))
 
-@app.route('/view_matches/', strict_slashes=False, methods=['GET'])
+@app.route('/view_matches/', strict_slashes=False, methods=['GET', 'DELETE'])
 def view_matches():
-    with Session() as session:
-        this_user = logged_in_session.get("user_id")
-        user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-        matches = session.query(Matches).filter(or_(Matches.user_1_id == this_user, Matches.user_2_id == this_user)).order_by(desc(Matches.created_at)).all()
-        if matches is None:
-                print("\n\n\n")
-                print("redirected as there are no matches")
-                print("\n\n\n")
-                return redirect(url_for("dashboard"))
-        my_list = []
+    if request.method == "GET":
+        with Session() as session:
+            this_user = logged_in_session.get("user_id")
+            user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+            matches = session.query(Matches).filter(or_(Matches.user_1_id == this_user, Matches.user_2_id == this_user)).order_by(desc(Matches.created_at)).all()
+            if matches is None:
+                    print("\n\n\n")
+                    print("redirected as there are no matches")
+                    print("\n\n\n")
+                    return redirect(url_for("dashboard"))
+            my_list = []
 
 
-        for match in matches:
-            if match.user_1_id == this_user:
-                likee = session.query(Users).filter_by(id=match.user_2_id).first()
-                my_list.append(likee)
-            if match.user_2_id == this_user:
-                likee = session.query(Users).filter_by(id=match.user_1_id).first()
-                my_list.append(likee)
-        distance_dict = {}
-        for candidate1 in my_list:
-            candidate_location = "{}, {}".format(candidate1.latitude, candidate1.longitude)
-            user_location = "{}, {}".format(user.latitude , user.longitude)
-            distance = geodesic(candidate_location, user_location).kilometers
-            real_distance = int(distance)
-            distance_dict[candidate1.user_name] = real_distance
+            for match in matches:
+                if match.user_1_id == this_user:
+                    likee = session.query(Users).filter_by(id=match.user_2_id).first()
+                    my_list.append(likee)
+                if match.user_2_id == this_user:
+                    likee = session.query(Users).filter_by(id=match.user_1_id).first()
+                    my_list.append(likee)
+            distance_dict = {}
+            for candidate1 in my_list:
+                candidate_location = "{}, {}".format(candidate1.latitude, candidate1.longitude)
+                user_location = "{}, {}".format(user.latitude , user.longitude)
+                distance = geodesic(candidate_location, user_location).kilometers
+                real_distance = int(distance)
+                distance_dict[candidate1.user_name] = real_distance
 
-        return render_template('view_matches.html', result=my_list, user=user, distance=distance_dict)
+            return render_template('view_matches.html', result=my_list, user=user, distance=distance_dict)
+    elif request.method == "DELETE":
+        form_data = request.json
+        other_user = int(form_data["id"])
+        with Session() as session:
+            user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+            matches = session.query(Matches).filter(or_(Matches.user_1_id == user.id, Matches.user_2_id == user.id)).all()
+
+            print("\n")
+
+            for a in matches:
+                if a.user_1_id == user.id and a.user_2_id == other_user:
+                    session.delete(a)
+                if a.user_2_id == user.id and a.user_1_id == other_user:
+                    session.delete(a)
+            like_to_delete = session.query(Likes).filter(Likes.user_1_id == user.id, Likes.user_2_id == other_user).first()
+            like_to_delete_2 = session.query(Likes).filter(Likes.user_1_id == other_user, Likes.user_2_id == user.id).first()
+            session.delete(like_to_delete)
+            session.delete(like_to_delete_2)
+            session.commit()
+            return({"success": "deleted this match"})
+
+
+
 
 
 
