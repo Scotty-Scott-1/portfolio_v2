@@ -14,7 +14,7 @@
 }
 
 .card {
-	height: fit-content;
+	max-height: 526px;
 	width: 50vh;
 	border: 3px;
 	border-style: solid;
@@ -23,6 +23,7 @@
 	text-align: center;
 	display: none;
 	margin-top: 5px;
+	overflow-y: auto;
 }
 
 .card.active {
@@ -64,11 +65,39 @@
 
 #card_info {
 	margin-left: 0;
-
+	display: block;
+	text-align: center;
 }
 
+#card_info_1 {
+	font-size: xx-large;
+	margin: 0;
+}
 
-@media only screen and (max-width: 600px) {
+#card_info_3 {
+	text-wrap: pretty;
+	overflow-y: auto;
+}
 
+.marck-script-regular {
+	font-family: "Marck Script", cursive;
+	font-weight: 400;
+	font-style: normal;
+  }
+
+
+@media only screen and (max-width: 350px) {
+
+	.card.active {
+		width: 95%;
+	}
+
+	#card_info {
+		margin-left: 0;
+		max-width: 90%;
+	}
+	#pp {
+		width: 90%;
+	}
 
 }

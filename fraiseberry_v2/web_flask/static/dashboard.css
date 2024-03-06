@@ -17,14 +17,13 @@ header {
 
 
 header img {
-	max-height: 50px;
-	max-width: 50px;
+	max-height: 100px;
+	max-width: 100px;
 }
 
-header h1{
-	padding: 5px;
-	max-height: fit-content;
-	font-size: medium;
+#title {
+	font-size: xx-large;
+	margin: 0;
 }
 
 .fraise {
@@ -114,3 +113,9 @@ ul li {
 	justify-content: center;
 	margin-right: 10px;
 	}
+
+.marck-script-regular {
+	font-family: "Marck Script", cursive;
+	font-weight: 400;
+	font-style: normal;
+  }
