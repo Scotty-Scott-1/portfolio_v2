@@ -32,7 +32,7 @@
 			</div>
 			<div class="input-box">
 				<input type="range" min="18" max="100" step="1" name="min_age" id="min_age" value="{{ preferences.min_age }}">
-				<input type="range" min="18" max="100" step="1"  name="max_age" id="max_age" value="{{ preferences.min_age }}">
+				<input type="range" min="18" max="100" step="1"  name="max_age" id="max_age" value="{{ preferences.max_age }}">
 				<input type="range" min="1" max="1000" step="5"  name="distance" id="distance" value="{{ preferences.distance}}">
 				<select class ="input" name="intent" id="intent">
 					<option value="Romantic relationship" {% if preferences.intentions == "Romantic relationship" %} selected {% endif %}>Romantic relationship</option>
@@ -46,9 +46,9 @@
 				</select>
 			</div>
 			<div class="value-box">
-				<p id="age_value">{{ preferences.min_age }}</p>
-				<p id="age_value_max">{{ preferences.max_age }}</p>
-				<p id="distance_value">{{ preferences.distance }}</p>
+				<p id="age_value">{% if preferences %} {{ preferences.min_age }} {% else %} 50 {% endif %}</p>
+				<p id="age_value_max">{% if preferences %} {{ preferences.max_age }} {% else %} 50 {% endif %}</p>
+				<p id="distance_value">{% if preferences %} {{ preferences.distance }} {% else %} 50 {% endif %}</p>
 			</div>
 		</div>
 		<div>
