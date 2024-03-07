@@ -287,6 +287,11 @@ def swipe():
                 shuffled_list.remove(a)
                 print("user themself was in the list but removed")
 
+        if len(shuffled_list) > 20:
+            shuffled_list = shuffled_list[:20]
+            print("list was over 20")
+            
+
         print("\n\n")
         session.close()
         return render_template('swipe.html', result=shuffled_list, distance=distance_dict)

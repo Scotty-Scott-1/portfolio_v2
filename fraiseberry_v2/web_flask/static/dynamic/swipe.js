@@ -42,8 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
 						}
 						if (index >= candidates.length && result2 != "New Match") {
 							index = 0;
-							alert("Your search results are delepeted. Swipe again or widen your search")
-							window.location.href = '/dashboard/';
+							window.location.href = '/swipe/';
 						}
 					});
 
@@ -54,8 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					index++;
 					if (index >= candidates.length) {
 						index = 0;
-						alert("Your search results are delepeted. Swipe again or widen your search")
-						window.location.href = '/dashboard/';
+						window.location.href = '/swipe/';
 					}
 					show(index);
 					console.log(index);
