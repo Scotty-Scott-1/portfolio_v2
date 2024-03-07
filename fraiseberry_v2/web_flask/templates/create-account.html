@@ -30,7 +30,7 @@
 			<div class="input-box">
 				<input type="text" placeholder="enter your name" name="first_name">
 				<input type="text" placeholder="enter your last name" name="last_name">
-				<input type="date" placeholder="enter your date of birth" name="date_of_birth">
+				<input type="date" placeholder="enter your date of birth" name="date_of_birth" max="{{ min_dob.strftime('%Y-%m-%d') }}">
 				<input type="text" placeholder="example@example.com" name="email">
 				<input type="text" placeholder="enter a username" name="user_name">
 				<input type="password" name="password">

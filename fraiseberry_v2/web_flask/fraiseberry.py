@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Sequence, Date, D
 from sqlalchemy import MetaData, Sequence, or_, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from create_tables import Users
 from create_tables import User_preferences, User_pics, Likes, Matches
@@ -80,7 +80,10 @@ def signin():
 @app.route('/signup', strict_slashes=False, methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template('create-account.html')
+        current_date = datetime.today()
+        min_dob = current_date - timedelta(days=18*365) - timedelta(days=5)
+
+        return render_template('create-account.html', min_dob=min_dob)
     elif request.method == 'POST':
         form_data = request.json
         session = Session()
@@ -89,6 +92,11 @@ def signup():
         if existing_user:
             session.close()
             return {"Failed": "User name already exists"}
+
+        existing_user = session.query(Users).filter_by(email=form_data["email"]).first()
+        if existing_user:
+            session.close()
+            return {"Failed": "email already in use"}
 
 
         hashed_password = generate_password_hash(form_data["user_password"])
@@ -290,7 +298,7 @@ def swipe():
         if len(shuffled_list) > 20:
             shuffled_list = shuffled_list[:20]
             print("list was over 20")
-            
+
 
         print("\n\n")
         session.close()
