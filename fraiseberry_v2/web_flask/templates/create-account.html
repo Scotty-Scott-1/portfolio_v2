@@ -68,9 +68,18 @@
 
 						})
 
-						.then(response => response.json())
-						.then(data => window.location.href = "/signin")
-						.catch(error => console.error('Error:', error));
+						.then(result => {
+							return result.text();
+						})
+						.then(result2 => {
+							console.log(result2);
+							if (result2 == "must be over 18") {
+								alert("must be over 18")
+							}
+							if (result2 == "created new user") {
+								window.location.href = "/signin"
+							}
+						});
 					}
 				</script>
 			</main>

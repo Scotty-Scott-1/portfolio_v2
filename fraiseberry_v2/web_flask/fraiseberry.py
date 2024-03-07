@@ -109,10 +109,14 @@ def signup():
             today = datetime.today()
             age = datetime.strptime(str(new_user.date_of_birth), "%Y-%m-%d")
             real_age = today.year - age.year - ((today.month, today.day) < (age.month, age.day))
+            if real_age < 18:
+                session.close()
+                return "must be over 18"
+
             new_user.age = real_age
 
             session.commit()
-            return {"Success": "created new user"}
+            return "created new user"
 
 @app.route('/dashboard/', strict_slashes=False)
 def dashboard():
