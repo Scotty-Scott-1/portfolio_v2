@@ -29,10 +29,11 @@ main {
 	height: 70vh;
 	width: 80vw;
 	border-style: solid;
+	border-color: rgb(168, 22, 22);
 	border-width: 4px;
 	border-radius: 30px;
 	flex-direction: column;
-	padding: 20px;
+	padding: 16px;
 	align-items: center;
 
 	overflow-y: auto ;
@@ -42,7 +43,6 @@ main {
 .dm {
 	width: min-content;
 	height: min-content;
-
 	display: block;
 	margin: 0;
 	width: auto
@@ -60,6 +60,7 @@ main {
 	margin: 0;
 	padding: 20px;
 	font-size: large;
+	word-wrap: break-word;
 
 }
 
@@ -76,12 +77,14 @@ main {
 }
 .position_this_user .datetime {
 	margin-left: auto;
-	width: min-content;
+	text-align: right;
+	margin-right: 5px;
 }
 .position_this_user .text {
 	margin-left: auto;
 	background-color: rgb(55, 190, 190);
 	border-style: none;
+	width: fit-content;
 }
 
 .position_other_user .text {
@@ -104,6 +107,10 @@ main {
 
 #send_icon {
 	margin-top: 20px;
+}
+
+.hidden {
+	display: none;
 }
 
 @media only screen and (max-width: 400px) {

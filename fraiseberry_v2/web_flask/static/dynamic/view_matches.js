@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	candidate.forEach((candidate) => {
 		const bin = candidate.querySelector(".bin")
+		const message = candidate.querySelector(".message")
+
 		bin.addEventListener("click", () =>{
 			const id = candidate.querySelector(".not_visable")
 			const form_data = {
@@ -31,7 +33,18 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 		});
 
+		message.addEventListener("click", () => {
+			const id = candidate.querySelector(".not_visable")
+			const match_id = id.textContent
+			fetch(`/message/?match_id=${match_id}`, {
+				method: "GET",
+				headers: {"Content-Type": "application/json"}
+			})
 
+			.then(response => {
+				window.location.href = response.url;
+			});
+		});
 
 
 

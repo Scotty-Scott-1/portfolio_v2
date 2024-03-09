@@ -7,13 +7,13 @@ from flask import Flask, render_template, request, redirect, session as logged_i
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine, Column, Integer, String, Sequence, Date, DateTime, Boolean, Enum, Text, ForeignKey
-from sqlalchemy import MetaData, Sequence, or_, desc
+from sqlalchemy import MetaData, Sequence, or_, desc, asc, union
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from create_tables import Users
-from create_tables import User_preferences, User_pics, Likes, Matches
+from create_tables import User_preferences, User_pics, Likes, Matches, Messages
 from sys import argv
 import base64
 import random
@@ -508,7 +508,36 @@ def view_matches():
             return({"success": "deleted this match"})
 
 
+@app.route('/message/', strict_slashes=False, methods=['GET', 'POST'])
+def messsage ():
+    this_user = logged_in_session.get("user_id")
+    if request.method == "GET":
+        match_id = int(request.args.get('match_id'))
+        with Session() as session:
+            match_user = session.query(Users).filter_by(id=match_id).first()
+            match_user_name = match_user.user_name
 
+            dms_from_user = session.query(Messages).filter(Messages.sender_id == this_user ,Messages.receiver_id == match_id)
+            dms_from_match = session.query(Messages).filter(Messages.sender_id == match_id ,Messages.receiver_id == this_user)
+            combined = dms_from_user.union(dms_from_match).order_by(asc(Messages.sent_at)).limit(200).all()
+
+        print()
+        print("the user's id is: {}".format(this_user))
+        print("the match's id is: {}".format(match_id))
+        print()
+        return render_template('messages.html', match_user_name=match_user_name, match_id=match_id, this_user_id=this_user, combined=combined)
+    if request.method == "POST":
+        match_id = int(request.args.get('match_id'))
+        form_data = request.json
+        print(form_data)
+        with Session() as session:
+            new_message = Messages()
+            new_message.sender_id = this_user
+            new_message.receiver_id = match_id
+            new_message.content = form_data["text"]
+            session.add(new_message)
+            session.commit()
+        return({"success": "printed the form data"})
 
 
 

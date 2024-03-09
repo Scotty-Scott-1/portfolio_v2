@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 		<link rel='stylesheet' href="../static/messages.css">
-		<script src="../static/dynamic/new_match_passive.js"></script>
+		<script src="../static/dynamic/message.js"></script>
 		<script src="https://cdn.lordicon.com/lordicon.js"></script>
 		<title>Get started</title>
 	</head>
@@ -16,42 +16,22 @@
 					trigger="hover">
 				</lord-icon>
 			</header>
+			<p class="hidden" id="varThisUserID">{{ this_user_id }}</p>
+			<p class="hidden" id="varMatchID">{{ match_id }}</p>
 
 			<main>
-				<p id="match_name">JimBob</p>
+				<p id="match_name">{{ match_user_name }}</p>
+
 				<div id="message_container">
 
-					<div class="dm position_other_user">
-						<p class="text">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec odio sed odio pretium hendrerit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Praesent id pretium nulla. Maecenas viverra arcu non tellus vehicula accumsan. Nullam nec mauris et tortor auctor congue ut non lectus. Nullam sit amet sapien velit. Ut vitae metus non nulla feugiat lacinia. Fusce porttitor arcu ligula, vitae fringilla turpis finibus et. Fusce eget odio id quam mollis varius a at ante. Vestibulum rhoncus euismod neque at ultrices. Vivamus aliquam mauris a libero viverra, at cursus libero facilisis.
-							Proin gravida euismod metus vel fermentum. Proin vestibulum eros sit amet nisi varius varius. Vestibulum in ipsum ac justo aliquam fermentum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer lobortis aliquam tellus, vel placerat orci tempor et. Nullam nec justo eu sapien scelerisque aliquet nec et ante. Nam id efficitur lorem, nec blandit velit. Integer aliquam, nulla a dapibus rhoncus, felis nunc feugiat dui, nec aliquet elit nulla vitae enim. Nulla facilisi.
-							Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Morbi tempus vestibulum odio sit amet interdum. Integer eu justo urna. Proin tristique mi non nisi dignissim, ac elementum tortor molestie. Cras sed sodales enim. Mauris gravida mi ac suscipit consequat. Mauris non fermentum orci, nec convallis nisi. Nulla facilisi. Vestibulum accumsan arcu vel est ultrices, vitae laoreet tortor viverra. Integer vestibulum leo a libero fermentum, vel facilisis quam fringilla. Vivamus non leo non tortor condimentum dictum. Vivamus auctor tortor nec commodo tincidunt. Maecenas nec vestibulum lectus.
-						</p>
-						<p class="datetime">08/03/2023 - 16:01</p>
+					{% for dm in combined %}
+					<div class="dm">
+						<p class="text">{{ dm.content }}</p>
+						<p class="datetime">{{ dm.sent_at }}</p>
+						<p class="hidden" id="senderID">{{ dm.sender_id }}</p>
 					</div>
+					{% endfor %}
 
-					<div class="dm position_this_user">
-						<p class="text">hello</p>
-						<p class="datetime">08/03/2023 - 16:05</p>
-					</div>
-
-					<div class="dm position_other_user">
-						<p class="text">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec odio sed odio pretium hendrerit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Praesent id pretium nulla. Maecenas viverra arcu non tellus vehicula accumsan. Nullam nec mauris et tortor auctor congue ut non lectus. Nullam sit amet sapien velit. Ut vitae metus non nulla feugiat lacinia. Fusce porttitor arcu ligula, vitae fringilla turpis finibus et. Fusce eget odio id quam mollis varius a at ante. Vestibulum rhoncus euismod neque at ultrices. Vivamus aliquam mauris a libero viverra, at cursus libero facilisis.
-							Proin gravida euismod metus vel fermentum. Proin vestibulum eros sit amet nisi varius varius. Vestibulum in ipsum ac justo aliquam fermentum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer lobortis aliquam tellus, vel placerat orci tempor et. Nullam nec justo eu sapien scelerisque aliquet nec et ante. Nam id efficitur lorem, nec blandit velit. Integer aliquam, nulla a dapibus rhoncus, felis nunc feugiat dui, nec aliquet elit nulla vitae enim. Nulla facilisi.
-							Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Morbi tempus vestibulum odio sit amet interdum. Integer eu justo urna. Proin tristique mi non nisi dignissim, ac elementum tortor molestie. Cras sed sodales enim. Mauris gravida mi ac suscipit consequat. Mauris non fermentum orci, nec convallis nisi. Nulla facilisi. Vestibulum accumsan arcu vel est ultrices, vitae laoreet tortor viverra. Integer vestibulum leo a libero fermentum, vel facilisis quam fringilla. Vivamus non leo non tortor condimentum dictum. Vivamus auctor tortor nec commodo tincidunt. Maecenas nec vestibulum lectus.
-						</p>
-						<p class="datetime">08/03/2023 - 16:01</p>
-					</div>
-
-					<div class="dm position_this_user">
-						<p class="text">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec odio sed odio pretium hendrerit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Praesent id pretium nulla. Maecenas viverra arcu non tellus vehicula accumsan. Nullam nec mauris et tortor auctor congue ut non lectus. Nullam sit amet sapien velit. Ut vitae metus non nulla feugiat lacinia. Fusce porttitor arcu ligula, vitae fringilla turpis finibus et. Fusce eget odio id quam mollis varius a at ante. Vestibulum rhoncus euismod neque at ultrices. Vivamus aliquam mauris a libero viverra, at cursus libero facilisis.
-							Proin gravida euismod metus vel fermentum. Proin vestibulum eros sit amet nisi varius varius. Vestibulum in ipsum ac justo aliquam fermentum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer lobortis aliquam tellus, vel placerat orci tempor et. Nullam nec justo eu sapien scelerisque aliquet nec et ante. Nam id efficitur lorem, nec blandit velit. Integer aliquam, nulla a dapibus rhoncus, felis nunc feugiat dui, nec aliquet elit nulla vitae enim. Nulla facilisi.
-							Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Morbi tempus vestibulum odio sit amet interdum. Integer eu justo urna. Proin tristique mi non nisi dignissim, ac elementum tortor molestie. Cras sed sodales enim. Mauris gravida mi ac suscipit consequat. Mauris non fermentum orci, nec convallis nisi. Nulla facilisi. Vestibulum accumsan arcu vel est ultrices, vitae laoreet tortor viverra. Integer vestibulum leo a libero fermentum, vel facilisis quam fringilla. Vivamus non leo non tortor condimentum dictum. Vivamus auctor tortor nec commodo tincidunt. Maecenas nec vestibulum lectus.
-						</p>
-						<p class="datetime">08/03/2023 16:01</p>
-					</div>
 				</div>
 				<div id="typing">
 					<textarea name="" id="text_area" cols="30" rows="5"></textarea>
