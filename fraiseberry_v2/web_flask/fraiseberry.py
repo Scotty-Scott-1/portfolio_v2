@@ -18,6 +18,8 @@ from sys import argv
 import base64
 import random
 from geopy.distance import geodesic
+from email_validator import validate_email
+from password_strength import PasswordPolicy, PasswordStats
 
 import os
 import cv2
@@ -86,31 +88,55 @@ def signup():
         return render_template('create-account.html', min_dob=min_dob)
     elif request.method == 'POST':
         form_data = request.json
-        session = Session()
-
-        existing_user = session.query(Users).filter_by(user_name=form_data["user_name"]).first()
-        if existing_user:
-            session.close()
-            return {"Failed": "User name already exists"}
-
-        existing_user = session.query(Users).filter_by(email=form_data["email"]).first()
-        if existing_user:
-            session.close()
-            return {"Failed": "email already in use"}
-
-
-        hashed_password = generate_password_hash(form_data["user_password"])
-        form_data["user_password"] = hashed_password
-
-        new_user = Users(**form_data)
         with Session() as session:
+
+            """check thqt form is filled in"""
+            for value in form_data.values():
+                if value == "":
+                    return "form incomplete"
+
+            """check that another user does not have the same user_name"""
+            existing_user = session.query(Users).filter_by(user_name=form_data["user_name"]).first()
+            if existing_user:
+                return "User name already exists"
+
+            """check that another user does not have the same email"""
+            existing_user = session.query(Users).filter_by(email=form_data["email"]).first()
+            if existing_user:
+                return "email already in use"
+
+            """check that email is valid"""
+            try:
+                validate_email(form_data["email"])
+            except Exception as e:
+                return "email not valid"
+
+            """check that the password is is strong"""
+            policy = PasswordPolicy.from_names(
+                length=8,
+                uppercase=1,
+                numbers=1,
+                special=1
+            )
+            strength = policy.test(form_data["user_password"])
+            if strength:
+                return "password not valid"
+
+            """hash the password"""
+            hashed_password = generate_password_hash(form_data["user_password"])
+            form_data["user_password"] = hashed_password
+
+            """create the new user"""
+            new_user = Users(**form_data)
             session.add(new_user)
 
+
+            """check that the new user is over 18"""
             today = datetime.today()
             age = datetime.strptime(str(new_user.date_of_birth), "%Y-%m-%d")
             real_age = today.year - age.year - ((today.month, today.day) < (age.month, age.day))
+
             if real_age < 18:
-                session.close()
                 return "must be over 18"
 
             new_user.age = real_age
