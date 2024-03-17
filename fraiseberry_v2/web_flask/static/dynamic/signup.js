@@ -24,14 +24,26 @@ document.addEventListener("DOMContentLoaded", function() {
 						headers: {"Content-Type": "application/json"}
 
 					})
+					.then(result => {
+						return result.text();
+					})
+					.then(result2 => {
+						console.log(result2);
+						if (result2 == "email not verified") {
+							window.location.href = "/verify_email/"
+						}
+						if (result2 == "email verified") {
+							window.location.href = "/new_match_passive/"
+						}
+						if (result2 == "incorrect username or password") {
+							alert("incorrect username or password")
+						}
 
-					.then(response => response.json())
-					.then(data =>window.location.href = "/new_match_passive/")
-					.catch(error => console.error('Error:', error));
-				});
 
+					});
+			});
 		} else {
-			console.log("geolocation not supported")
+			alert("geolocation not supported")
 		}
 
 	});

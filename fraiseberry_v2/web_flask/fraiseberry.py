@@ -20,15 +20,13 @@ import random
 from geopy.distance import geodesic
 from email_validator import validate_email
 from password_strength import PasswordPolicy, PasswordStats
-
-import os
-import cv2
+from flask_mail import Mail, Message
 
 
 
 
 app = Flask(__name__, static_url_path='/static')
-app.secret_key = "FRAISE"
+app.secret_key = argv[8]
 
 user_name = argv[1]
 password = argv[2]
@@ -38,6 +36,19 @@ db_url = "mysql+mysqldb://{}:{}@{}/{}".format(user_name, password, host, db_name
 
 engine = create_engine(db_url, echo=True, pool_pre_ping=True)
 Session = sessionmaker(bind=engine)
+
+
+app.config['MAIL_SERVER'] = argv[7]
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = argv[5]
+app.config['MAIL_PASSWORD'] = argv[6]
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail= Mail(app)
+
+
+
 
 @app.route('/', strict_slashes=False)
 def home():
@@ -50,31 +61,28 @@ def signin():
         return render_template('signup.html')
     elif request.method == 'POST':
         form_data = request.json
-        session = Session()
+        with Session() as session:
 
-        user = session.query(Users).filter_by(user_name=form_data["user_name"]).first()
+            user = session.query(Users).filter_by(user_name=form_data["user_name"]).first()
 
-        if user and check_password_hash(user.user_password, form_data["user_password"]):
-            logged_in_session["user_id"] = user.id
-            user.latitude = form_data["latitude"]
-            user.longitude = form_data["longitude"]
+            if user and check_password_hash(user.user_password, form_data["user_password"]):
+                logged_in_session["user_id"] = user.id
+                user.latitude = form_data["latitude"]
+                user.longitude = form_data["longitude"]
 
-            today = datetime.today()
-            age = datetime.strptime(str(user.date_of_birth), "%Y-%m-%d")
-            real_age = today.year - age.year - ((today.month, today.day) < (age.month, age.day))
-            user.age = real_age
+                today = datetime.today()
+                age = datetime.strptime(str(user.date_of_birth), "%Y-%m-%d")
+                real_age = today.year - age.year - ((today.month, today.day) < (age.month, age.day))
+                user.age = real_age
 
-            session.commit()
+                session.commit()
 
-            result_user_name = user.user_name
-            result_user_id = user.id
-            session.close()
-
-
-            return {"Success": "logged in: {}. User id: {}".format(result_user_name, result_user_id)}
-        else:
-            session.close()
-            return {"Failed": "Username or password incorrect"}
+                if user.email_verified == False:
+                    return "email not verified"
+                else:
+                    return "email verified"
+            else:
+                return "incorrect username or password"
 
 
 
@@ -103,7 +111,8 @@ def signup():
             """check that another user does not have the same email"""
             existing_user = session.query(Users).filter_by(email=form_data["email"]).first()
             if existing_user:
-                return "email already in use"
+                if existing_user.email_verified == True:
+                    return "email already in use"
 
             """check that email is valid"""
             try:
@@ -148,16 +157,22 @@ def signup():
 def dashboard():
     session = Session()
     user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-    profile_pic = session.query(User_pics).filter_by(user_id=logged_in_session.get("user_id")).order_by(User_pics.id.desc()).first()
-    session.close()
-    if profile_pic:
-        return render_template('dashboard2.html', user=user, profile_pic=profile_pic.path)
-    return render_template('dashboard.html', user=user)
+    if user.email_verified == True:
+        profile_pic = session.query(User_pics).filter_by(user_id=logged_in_session.get("user_id")).order_by(User_pics.id.desc()).first()
+        session.close()
+        if profile_pic:
+            return render_template('dashboard2.html', user=user, profile_pic=profile_pic.path)
+        return render_template('dashboard.html', user=user)
+    else:
+        return render_template('verification.html')
 
 @app.route('/preferences/', strict_slashes=False, methods=['GET', 'POST'])
 def preferences():
     session = Session()
     preferences = session.query(User_preferences).filter_by(user_id=logged_in_session.get("user_id")).first()
+    this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+    if this_user.email_verified == False:
+        return render_template('verification.html')
     if request.method == "GET":
         return render_template('update-preferences.html', preferences=preferences)
     elif request.method == 'POST':
@@ -203,6 +218,10 @@ def preferences():
 @app.route('/camera/', strict_slashes=False, methods=['GET', 'POST'])
 def camera():
         if request.method == "GET":
+            with Session() as session:
+                user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+                if user.email_verified == False:
+                    return render_template('verification.html')
             return render_template('get_pic.html')
         if request.method == "POST":
             data = request.json
@@ -210,27 +229,25 @@ def camera():
             _, encoded = data["ImageData"].split(",", 1)
             image_bytes = base64.b64decode(encoded)
 
-            session = Session()
-            user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+            with Session() as session:
+                user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 
-            filename = "{}{}.png".format(user.user_name, random.random());
+                filename = "{}{}.png".format(user.user_name, random.random());
 
-            with open("static/images/user_pics/" + filename, "wb") as file:
-                file.write(image_bytes)
+                with open("static/images/user_pics/" + filename, "wb") as file:
+                    file.write(image_bytes)
 
-            new_user_pics = User_pics()
-            new_user_pics.user_id = user.id
-            new_user_pics.file_name = filename
-            new_user_pics.path = "static/images/user_pics/{}".format(filename)
-            print(new_user_pics.path)
+                new_user_pics = User_pics()
+                new_user_pics.user_id = user.id
+                new_user_pics.file_name = filename
+                new_user_pics.path = "static/images/user_pics/{}".format(filename)
+                print(new_user_pics.path)
 
-            session.add(new_user_pics)
-            user.profile_pic_path = new_user_pics.path
-            session.commit()
+                session.add(new_user_pics)
+                user.profile_pic_path = new_user_pics.path
+                session.commit()
 
-            session.close()
-
-            return {"success": "saved file"}
+                return {"success": "saved file"}
 
 @app.route('/swipe/', strict_slashes=False, methods=['GET', 'POST'])
 def swipe():
@@ -564,6 +581,41 @@ def messsage ():
             session.add(new_message)
             session.commit()
         return({"success": "printed the form data"})
+
+@app.route('/verify_email/', strict_slashes=False, methods=['GET', 'POST'])
+def verify_email ():
+    if request.method == "GET":
+        with Session() as session:
+            this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+            if this_user:
+                if this_user.email_verified == True:
+                    return "email has been verified"
+                elif this_user.email_verified == False:
+                    code = random.randint(1000, 9999)
+                    msg = Message('Hello from fraiseberry', sender = 'fraiseberryfr@gmail.com', recipients = [this_user.email])
+                    msg.body = "Thanks for signing up for a fraise account.\n\nPlease see the code to verify your email address: {}\n\nIf you didn't signup for a fraise account please ignore and delete this email\n\nStart your journey to find love now".format(code)
+                    mail.send(msg)
+                    this_user.verification_code = code
+                    session.commit()
+                    return render_template("verification.html")
+
+    if request.method == "POST":
+        with Session() as session:
+            this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+            form_data = request.json
+
+            parsed_code = form_data["no1"] + form_data["no2"] + form_data["no3"] + form_data["no4"]
+            if parsed_code.isdigit():
+                parsed_code_int = int(parsed_code)
+            else:
+                return "incorrect code"
+
+            if parsed_code_int == this_user.verification_code:
+                this_user.email_verified = True
+                session.commit()
+                return "email has been verified"
+            else:
+                return "incorrect code"
 
 
 

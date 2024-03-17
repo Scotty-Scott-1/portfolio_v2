@@ -24,7 +24,8 @@ class Users(Base):
     last_name = Column(String(50))
     gender = Column(String(50))
     date_of_birth = Column(Date)
-    email = Column(String(100), unique=True)
+    email = Column(String(100))
+    email_verified = Column(Boolean, nullable=False, server_default="0")
     user_password = Column(String(255), nullable=False, server_default="")
     is_active = Column(Boolean, nullable=False, server_default="0")
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -36,6 +37,7 @@ class Users(Base):
     latitude = Column(Float)
     age = Column(Integer)
     profile_pic_path = Column(String(500))
+    verification_code = Column(Integer)
 
 class User_preferences(Base):
     __tablename__ = "User_preferences"
@@ -75,11 +77,5 @@ class User_pics(Base):
     file_name = Column(String(500))
     path = Column(String(500))
     user_id = Column(Integer, ForeignKey(Users.id))
-
-class Location_preferences(Base):
-    __tablename__ = "Location_preferences"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(Users.id))
-    department = Column(String(200))
 
 Base.metadata.create_all(engine)
