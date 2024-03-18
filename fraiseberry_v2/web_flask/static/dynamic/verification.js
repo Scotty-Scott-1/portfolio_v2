@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		.then(result2 => {
 			console.log(result2);
 			if (result2 == "incorrect code") {
-				alert("the code was incorrect. A now code has been sent")
+				alert("the code was incorrect. A new code has been sent")
 				window.location.href = "/verify_email/"
 			}
 			if (result2 == "email has been verified") {
