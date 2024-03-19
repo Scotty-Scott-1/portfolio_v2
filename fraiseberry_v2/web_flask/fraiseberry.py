@@ -3,14 +3,12 @@
 starts a Flask web application
 """
 
-from flask import Flask, render_template, request, redirect, session as logged_in_session, send_file, url_for
+from flask import Flask, render_template, request, redirect, session as logged_in_session, url_for
 from datetime import datetime
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import create_engine, Column, Integer, String, Sequence, Date, DateTime, Boolean, Enum, Text, ForeignKey
-from sqlalchemy import MetaData, Sequence, or_, desc, asc, union
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime, date, timedelta
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy import or_, desc, asc
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from create_tables import Users
 from create_tables import User_preferences, User_pics, Likes, Matches, Messages
@@ -19,12 +17,10 @@ import base64
 import random
 from geopy.distance import geodesic
 from email_validator import validate_email
-from password_strength import PasswordPolicy, PasswordStats
+from password_strength import PasswordPolicy
 from flask_mail import Mail, Message
 
-
-
-
+#Flask/mail/SQL Achemy configuration
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = argv[8]
 
@@ -47,14 +43,13 @@ app.config['MAIL_USE_SSL'] = True
 
 mail= Mail(app)
 
-
-
-
+#log out fuction. Clears session cookie.
 @app.route('/', strict_slashes=False)
 def home():
     logged_in_session.clear()
     return render_template('homepage.html')
 
+#Check if username and password matches, update the user's real age and location
 @app.route('/signin', strict_slashes=False, methods=['GET', 'POST'])
 def signin():
     if request.method == 'GET':
@@ -86,7 +81,7 @@ def signin():
 
 
 
-
+#check that form data passes constraints
 @app.route('/signup', strict_slashes=False, methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
