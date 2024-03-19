@@ -11,24 +11,24 @@ Please follow the following steps:
 * Clone this repo
 * Install dependancies
 * Run the following command: ./create_tables.py argv1 argv2 argv3 argv4
-	the command line argument relate the MySQL database
-	user_name = argv[1]
-	password = argv[2]
-	host = argv[3]
-	db_name = argv[4]
+	* the command line argument relate the MySQL database:
+	* user_name = argv[1]
+	* password = argv[2]
+	* host = argv[3]
+	* db_name = argv[4]
 * Run the following command: ./fraiseberry.py argv1 argv2 argv3 argv4 argv5 argv6 argv7 argv8
-	Command line arguments 1 - 4 relate the MySQL database
-	user_name = argv[1]
-	password = argv[2]
-	host = argv[3]
-	db_name = argv[4]
+	* Command line arguments 1 - 4 relate the MySQL database
+	* user_name = argv[1]
+	* password = argv[2]
+	* host = argv[3]
+	* db_name = argv[4]
 
-	Command line arguments 5 - 7 relate the Fmask mail config
-	app.config['MAIL_USERNAME'] = argv[5]
-	app.config['MAIL_PASSWORD'] = argv[6]
-	app.config['MAIL_SERVER'] = argv[7]
+	* Command line arguments 5 - 7 relate the Fmask mail config
+	* app.config['MAIL_USERNAME'] = argv[5]
+	* app.config['MAIL_PASSWORD'] = argv[6]
+	* app.config['MAIL_SERVER'] = argv[7]
 
-	Command line arguments 8 is the app secret key
+	* Command line arguments 8 is the app secret key
 
 ## Usage
 
