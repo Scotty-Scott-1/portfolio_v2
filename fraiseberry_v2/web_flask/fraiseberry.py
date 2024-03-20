@@ -193,84 +193,86 @@ def dashboard():
 		else:
 			return render_template('verification.html')
 
-
+# Check if email verified else  forward to verification
+# On GET: return the update preferences template with this user's preferences instance
+# On POST: Update existing prefereces or if not exists create new instance
 @app.route('/preferences/', strict_slashes=False, methods=['GET', 'POST'])
 def preferences():
-	session = Session()
-	preferences = session.query(User_preferences).filter_by(user_id=logged_in_session.get("user_id")).first()
-	this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-	if this_user.email_verified == False:
-		return render_template('verification.html')
-	if request.method == "GET":
-		return render_template('update-preferences.html', preferences=preferences)
-	elif request.method == 'POST':
-		if preferences:
-			form_data = request.json
-			preferences.min_age = form_data["min_age"]
-			preferences.max_age = form_data["max_age"]
-			preferences.distance = form_data["distance"]
-			preferences.gender = form_data["gender"]
-			preferences.intentions = form_data["intentions"]
-			session.commit()
-			session.close()
+	with Session() as session:
 
-			session = Session()
-			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-			user.is_active = True
-			session.commit()
-			session.close()
+		# Get this user instance and this user's preferences instance
+		preferences = session.query(User_preferences).filter_by(user_id=logged_in_session.get("user_id")).first()
+		this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 
-			return {"success": "updated exiting preferences"}
-		else:
-			form_data = request.json
-			new_preferences = User_preferences()
-			new_preferences.min_age = form_data["min_age"]
-			new_preferences.max_age = form_data["max_age"]
-			new_preferences.distance = form_data["distance"]
-			new_preferences.gender = form_data["gender"]
-			new_preferences.intentions = form_data["intentions"]
-			new_preferences.user_id = logged_in_session.get("user_id")
+		# Check if email verified
+		if this_user.email_verified == False:
+			return render_template('verification.html')
 
-			session.add(new_preferences)
-			session.commit()
-			session.close()
+		if request.method == "GET":
+			return render_template('update-preferences.html', preferences=preferences)
 
-			session = Session()
-			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-			user.is_active = True
-			session.commit()
-			session.close()
+		elif request.method == 'POST':
+			# Update existing preferences
+			if preferences:
+				form_data = request.json
+				preferences.min_age = form_data["min_age"]
+				preferences.max_age = form_data["max_age"]
+				preferences.distance = form_data["distance"]
+				preferences.gender = form_data["gender"]
+				preferences.intentions = form_data["intentions"]
+				this_user.is_active = True
+				session.commit()
+				return {"success": "updated exiting preferences"}
+			else:
+				# Create new preferences
+				form_data = request.json
+				new_preferences = User_preferences()
+				new_preferences.min_age = form_data["min_age"]
+				new_preferences.max_age = form_data["max_age"]
+				new_preferences.distance = form_data["distance"]
+				new_preferences.gender = form_data["gender"]
+				new_preferences.intentions = form_data["intentions"]
+				new_preferences.user_id = logged_in_session.get("user_id")
 
-			return {"Success": "created new preferences"}
+				session.add(new_preferences)
+				this_user.is_active = True
+				session.commit()
+				return {"Success": "created new preferences"}
 
+# On GET: return the get_pic html tempalte. Check if email verified
+# On POST: get pic from js, parse and save to local storage. Update database with path
 @app.route('/camera/', strict_slashes=False, methods=['GET', 'POST'])
 def camera():
+
 		if request.method == "GET":
 			with Session() as session:
 				user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 				if user.email_verified == False:
 					return render_template('verification.html')
 			return render_template('get_pic.html')
-		if request.method == "POST":
-			data = request.json
 
+		if request.method == "POST":
+
+			# Encode image data
+			data = request.json
 			_, encoded = data["ImageData"].split(",", 1)
 			image_bytes = base64.b64decode(encoded)
 
 			with Session() as session:
 				user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 
+				# Set file name and save to local storage
 				filename = "{}{}.png".format(user.user_name, random.random());
-
 				with open("static/images/user_pics/" + filename, "wb") as file:
 					file.write(image_bytes)
 
+				# Create a new instance of user_pics
 				new_user_pics = User_pics()
 				new_user_pics.user_id = user.id
 				new_user_pics.file_name = filename
 				new_user_pics.path = "static/images/user_pics/{}".format(filename)
-				print(new_user_pics.path)
 
+				# Update user profile pic and push changs to database
 				session.add(new_user_pics)
 				user.profile_pic_path = new_user_pics.path
 				session.commit()
@@ -281,109 +283,79 @@ def camera():
 def swipe():
 
 	if request.method == "GET":
-		session = Session()
-		prefs = session.query(User_preferences).filter_by(user_id=logged_in_session.get("user_id")).first()
-		pref_gender = prefs.gender
-		pref_min_age = prefs.min_age
-		pref_max_age = prefs.max_age
-		pref_distance = prefs.distance
-		pref_intention = prefs.intentions
-		session.close()
+		with Session() as session:
+			# Get the user's preferences
+			prefs = session.query(User_preferences).filter_by(user_id=logged_in_session.get("user_id")).first()
+			pref_gender = prefs.gender
+			pref_min_age = prefs.min_age
+			pref_max_age = prefs.max_age
+			pref_distance = prefs.distance
+			pref_intention = prefs.intentions
 
-		session = Session()
-		user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-		this_user_age = user.age
-		this_user_user_name = user.user_name
-		this_user_latitude = user.latitude
-		this_user_longitude = user.longitude
-		session.close()
+			# Get the user's coordinates
+			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+			this_user_latitude = user.latitude
+			this_user_longitude = user.longitude
 
-		print("\n\n\n\n")
-		print("The preferred gender is {}. Aged between {} and {}. Living {}km from the user. The user is interested in {}. The user is {} years old. Their username is {}."
-			.format(pref_gender, pref_min_age, pref_max_age, pref_distance, pref_intention, this_user_age, this_user_user_name))
+			# Filter all users according the this user"s age and gender preferences
+			candiate_list = session.query(Users).filter_by(gender=pref_gender).filter(Users.age <= pref_max_age).filter(Users.age >= pref_min_age).all()
 
-		print("\n\n\n\n")
+			# If candidate intentions matches user intentions add canidate to result (list)
+			result = []
+			for candidate in candiate_list:
+				candidate_prefs = session.query(User_preferences).filter_by(user_id=candidate.id).first()
+				if candidate_prefs and candidate_prefs.intentions == pref_intention:
+					result.append(candidate)
 
-		session = Session()
-		candiate_list = session.query(Users).filter_by(gender=pref_gender).filter(Users.age <= pref_max_age).filter(Users.age >= pref_min_age).all()
-		result = []
-		for candidate in candiate_list:
-			user_prefs = session.query(User_preferences).filter_by(user_id=candidate.id).first()
-			if user_prefs and user_prefs.intentions == pref_intention:
-				result.append(candidate)
-
-		result1 = []
-
-
-		session = Session()
-		user_exisiting_likes = session.query(Likes).filter_by(user_1_id=logged_in_session.get("user_id")).all()
-		for candidate1 in result:
-			found = False
-			for like in user_exisiting_likes:
-				if like.user_2_id == candidate1.id:
-					found = True
-					break
-			if not found:
-				result1.append(candidate1)
+			# If the user has not already likeed the candidate, add candiate to result1 (list)
+			result1 = []
+			user_exisiting_likes = session.query(Likes).filter_by(user_1_id=logged_in_session.get("user_id")).all()
+			for candidate1 in result:
+				found = False
+				for like in user_exisiting_likes:
+					if like.user_2_id == candidate1.id:
+						found = True
+						break
+				if not found:
+					result1.append(candidate1)
 
 
-		distance_dict = {}
-		result2 = []
-		print("\n\n")
-		print("the user's location is {}, {}. Their username is {}. The max distance this user wants is {}.".format(this_user_latitude, this_user_longitude, this_user_user_name, pref_distance))
-		for candidate1 in result1:
-			print("the candiates location is {} {}. Their username is {}.".format(candidate1.latitude, candidate1.longitude, candidate1.user_name))
-			candidate_location = "{}, {}".format(candidate1.latitude, candidate1.longitude)
-			user_location = "{}, {}".format(this_user_latitude ,this_user_longitude)
-			distance = geodesic(candidate_location, user_location).kilometers
-			real_distance = int(distance)
-			print("distnace = {}".format(real_distance))
-			if real_distance <= pref_distance:
-				result2.append(candidate1)
-				distance_dict[candidate1.user_name] = real_distance
+			# Compare the users coordinates to the canidates and get the distance.
+			# If the canidates distance is within the user"s preference add canidate to result2 (list)
+			# Create a dictionary of the same users {"username": distance}
+			distance_dict = {}
+			result2 = []
+			for candidate1 in result1:
+				candidate_location = "{}, {}".format(candidate1.latitude, candidate1.longitude)
+				user_location = "{}, {}".format(this_user_latitude ,this_user_longitude)
+				distance = geodesic(candidate_location, user_location).kilometers
+				real_distance = int(distance)
 
+				if real_distance <= pref_distance:
+					result2.append(candidate1)
+					distance_dict[candidate1.user_name] = real_distance
 
-		print("result = ")
-		for a in result:
-			print(a.user_name)
+			# Shuffle the result
+			shuffled_list = result2.copy()
+			random.shuffle(shuffled_list)
 
-		print("result 1 = ")
-		for a in result1:
-			print(a.user_name)
+			# If this user happens to be in the result list remove them
+			for a in shuffled_list[:]:
+				if a.user_name == user.user_name:
+					shuffled_list.remove(a)
 
+			# Get a slice of the result list (first 20), if the list was over 20
+			if len(shuffled_list) > 20:
+				shuffled_list = shuffled_list[:20]
 
-		print("result 2 = ")
-		for a in result2:
-			print(a.user_name)
-
-		shuffled_list = result2.copy()
-		random.shuffle(shuffled_list)
-
-		print("\n\n")
-		print("shuffled list")
-
-		for a in shuffled_list:
-			print(a.user_name)
-
-		for a in shuffled_list[:]:
-			if a.user_name == user.user_name:
-				shuffled_list.remove(a)
-				print("user themself was in the list but removed")
-
-		if len(shuffled_list) > 20:
-			shuffled_list = shuffled_list[:20]
-			print("list was over 20")
-
-
-		print("\n\n")
-		session.close()
-		return render_template('swipe.html', result=shuffled_list, distance=distance_dict)
+			return render_template('swipe.html', result=shuffled_list, distance=distance_dict)
 
 	elif request.method == "POST":
 		form_data = request.json
 
 		with Session() as session:
 
+			# Get the user and likee
 			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 			likee = session.query(Users).filter_by(user_name=form_data["canidate_user_name"]).first()
 			if likee:
@@ -391,76 +363,61 @@ def swipe():
 				new_like.user_1_id = logged_in_session.get("user_id")
 				new_like.user_2_id = likee.id
 
-				"""check if likee and has already liked the liker."""
+				# Check if likee and has already liked the liker and create a new match
 				likee_liked_user = session.query(Likes).filter_by(user_1_id=likee.id, user_2_id=logged_in_session.get("user_id")).first()
-
 				if likee_liked_user:
 					new_like.is_matched = True
 					likee_liked_user.is_matched = True
-
 					new_match = Matches()
 					new_match.user_1_id = logged_in_session.get("user_id")
 					new_match.user_2_id = likee.id
-
 					session.add(new_like)
 					session.add(new_match)
 					session.commit()
-
-					print("\n\n\n")
-					print("CONGRATULATIONS: You have matched with {}".format(likee.first_name))
-					print("\n\n\n")
 					return "New Match"
-
 				else:
 					session.add(new_like)
 					session.commit()
-					print("\n\n\n")
-
 					return {"success": "created a like"}
 
 		return {"error": "user not found"}
 
 
-
+# On GET: return the update user info html template
+# On Post: Update info with data from the request
 @app.route('/update-user-info/', strict_slashes=False, methods=['GET', 'POST'])
 def update_user_info():
 	if request.method == "GET":
-		session = Session()
-		user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
-		session.close()
-		return render_template('update_user_info.html', user=user)
+		with Session() as session:
+			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+			return render_template('update_user_info.html', user=user)
+
 	if request.method == "POST":
 		form_data = request.json
-		session = Session()
-		user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+		with Session() as session:
+			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
+			user.first_name = form_data["first_name"]
+			user.last_name = form_data["last_name"]
+			user.date_of_birth = form_data["date_of_birth"]
+			user.email = form_data["email"]
+			user.user_name = form_data["user_name"]
+			user.gender = form_data["gender"]
+			user.bio = form_data["bio"]
+			session.commit()
+			return {"success": "updated user info"}
 
-		user.first_name = form_data["first_name"]
-		user.last_name = form_data["last_name"]
-		user.date_of_birth = form_data["date_of_birth"]
-		user.email = form_data["email"]
-		user.user_name = form_data["user_name"]
-		user.gender = form_data["gender"]
-		user.bio = form_data["bio"]
-
-		session.commit()
-		session.close()
-
-		return {"success": "updated user info"}
-
-
+# On GET: inform user and a new match
 @app.route('/new_match/', strict_slashes=False, methods=['GET'])
 def new_match():
+
 	if request.method == "GET":
 		this_user = logged_in_session.get("user_id")
+
 		with Session() as session:
 			match = session.query(Matches).filter(or_(Matches.user_1_id == this_user, Matches.user_2_id == this_user)).order_by(desc(Matches.created_at)).first()
 			if match is None:
-					print("\n\n\n")
-					print("redirected as there are no matches")
-					print("\n\n\n")
 					return redirect(url_for("dashboard"))
-			print("user 1: {}".format(match.user_1_id))
-			print("user 2: {}".format(match.user_2_id))
+
 			if match.user_1_id == this_user and not match.user_1_notified:
 				likee = session.query(Users).filter_by(id=match.user_2_id).first()
 				match.user_1_notified = True
@@ -468,6 +425,7 @@ def new_match():
 				profile_pic = likee.profile_pic_path
 				session.commit()
 				return render_template('new_match.html', name=name, profile_pic=profile_pic)
+
 			if match.user_2_id == this_user and not match.user_2_notified:
 				likee = session.query(Users).filter_by(id=match.user_1_id).first()
 				match.user_2_notified = True
@@ -475,11 +433,10 @@ def new_match():
 				profile_pic = likee.profile_pic_path
 				session.commit()
 				return render_template('new_match.html', name=name, profile_pic=profile_pic)
-		print("\n\n\n")
-		print("redirected as the user has been notified about the lastest passive match")
-		print("\n\n\n")
+
 		return redirect(url_for("dashboard"))
 
+# On GET: inform user and multiple new matches
 @app.route('/new_match_passive/', strict_slashes=False, methods=['GET'])
 def new_match_passive():
 	if request.method == "GET":
@@ -487,9 +444,6 @@ def new_match_passive():
 		with Session() as session:
 			matches = session.query(Matches).filter(or_(Matches.user_1_id == this_user, Matches.user_2_id == this_user)).order_by(desc(Matches.created_at)).all()
 			if matches is None:
-					print("\n\n\n")
-					print("redirected as there are no matches")
-					print("\n\n\n")
 					return redirect(url_for("dashboard"))
 
 			names = []
@@ -506,6 +460,7 @@ def new_match_passive():
 					session.commit()
 					names.append(name)
 					profile_pics.append(profile_pic)
+
 				if match.user_2_id == this_user and not match.user_2_notified:
 					likee = session.query(Users).filter_by(id=match.user_1_id).first()
 					match.user_2_notified = True
@@ -520,27 +475,24 @@ def new_match_passive():
 					zipped = zip(names, profile_pics)
 					return render_template('new_match_passive.html', zipped=zipped)
 
-
-		print("\n\n\n")
-		print("redirected as the user has been notified about the lastest passive matches")
-		print("\n\n\n")
 		return redirect(url_for("dashboard"))
 
+# On GET: Show all matches
 @app.route('/view_matches/', strict_slashes=False, methods=['GET', 'DELETE'])
 def view_matches():
 	if request.method == "GET":
 		with Session() as session:
+
+			# Get user and user's matches
 			this_user = logged_in_session.get("user_id")
 			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 			matches = session.query(Matches).filter(or_(Matches.user_1_id == this_user, Matches.user_2_id == this_user)).order_by(desc(Matches.created_at)).all()
+
 			if matches is None:
-					print("\n\n\n")
-					print("redirected as there are no matches")
-					print("\n\n\n")
 					return redirect(url_for("dashboard"))
+
+			# Get the a list of the other users from this users matches
 			my_list = []
-
-
 			for match in matches:
 				if match.user_1_id == this_user:
 					likee = session.query(Users).filter_by(id=match.user_2_id).first()
@@ -548,6 +500,8 @@ def view_matches():
 				if match.user_2_id == this_user:
 					likee = session.query(Users).filter_by(id=match.user_1_id).first()
 					my_list.append(likee)
+
+			# Get a dictinary of users: distance
 			distance_dict = {}
 			for candidate1 in my_list:
 				candidate_location = "{}, {}".format(candidate1.latitude, candidate1.longitude)
@@ -557,50 +511,56 @@ def view_matches():
 				distance_dict[candidate1.user_name] = real_distance
 
 			return render_template('view_matches.html', result=my_list, user=user, distance=distance_dict)
+
 	elif request.method == "DELETE":
 		form_data = request.json
 		other_user = int(form_data["id"])
 		with Session() as session:
+			# Get the user instance and a list of their matches
 			user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 			matches = session.query(Matches).filter(or_(Matches.user_1_id == user.id, Matches.user_2_id == user.id)).all()
 
-			print("\n")
-
+			# Delete the match instance
 			for a in matches:
 				if a.user_1_id == user.id and a.user_2_id == other_user:
 					session.delete(a)
 				if a.user_2_id == user.id and a.user_1_id == other_user:
 					session.delete(a)
+
+			# Get and delete the the two respective likes from the match
 			like_to_delete = session.query(Likes).filter(Likes.user_1_id == user.id, Likes.user_2_id == other_user).first()
 			like_to_delete_2 = session.query(Likes).filter(Likes.user_1_id == other_user, Likes.user_2_id == user.id).first()
 			session.delete(like_to_delete)
 			session.delete(like_to_delete_2)
+
 			session.commit()
 			return({"success": "deleted this match"})
 
 
+# On GET: Load the latest 200 messages from both users
+# On Post: Add a ,ew message instance
 @app.route('/message/', strict_slashes=False, methods=['GET', 'POST'])
 def messsage ():
 	this_user = logged_in_session.get("user_id")
 	if request.method == "GET":
 		match_id = int(request.args.get('match_id'))
 		with Session() as session:
+
+			# Get the match username
 			match_user = session.query(Users).filter_by(id=match_id).first()
 			match_user_name = match_user.user_name
 
+			# Combine the messages from both users
 			dms_from_user = session.query(Messages).filter(Messages.sender_id == this_user ,Messages.receiver_id == match_id)
 			dms_from_match = session.query(Messages).filter(Messages.sender_id == match_id ,Messages.receiver_id == this_user)
 			combined = dms_from_user.union(dms_from_match).order_by(asc(Messages.sent_at)).limit(200).all()
 
-		print()
-		print("the user's id is: {}".format(this_user))
-		print("the match's id is: {}".format(match_id))
-		print()
 		return render_template('messages.html', match_user_name=match_user_name, match_id=match_id, this_user_id=this_user, combined=combined)
 	if request.method == "POST":
+
 		match_id = int(request.args.get('match_id'))
 		form_data = request.json
-		print(form_data)
+
 		with Session() as session:
 			new_message = Messages()
 			new_message.sender_id = this_user
@@ -608,10 +568,14 @@ def messsage ():
 			new_message.content = form_data["text"]
 			session.add(new_message)
 			session.commit()
+
 		return({"success": "printed the form data"})
 
+# On GET: Check if email has been verified
+# On POST: Enter the verification code
 @app.route('/verify_email/', strict_slashes=False, methods=['GET', 'POST'])
 def verify_email ():
+
 	if request.method == "GET":
 		with Session() as session:
 			this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
@@ -619,12 +583,19 @@ def verify_email ():
 				if this_user.email_verified == True:
 					return "email has been verified"
 				elif this_user.email_verified == False:
+
+					# Get a random code
 					code = random.randint(1000, 9999)
+
+					# Send an email with the code
 					msg = Message('Hello from fraiseberry', sender = 'fraiseberryfr@gmail.com', recipients = [this_user.email])
 					msg.body = "Thanks for signing up for a fraise account.\n\nPlease see the code to verify your email address: {}\n\nIf you didn't signup for a fraise account please ignore and delete this email\n\nStart your journey to find love now".format(code)
 					mail.send(msg)
+
+					# Update the database with the code
 					this_user.verification_code = code
 					session.commit()
+
 					return render_template("verification.html")
 
 	if request.method == "POST":
@@ -632,12 +603,14 @@ def verify_email ():
 			this_user = session.query(Users).filter_by(id=logged_in_session.get("user_id")).first()
 			form_data = request.json
 
+			# Parse the code
 			parsed_code = form_data["no1"] + form_data["no2"] + form_data["no3"] + form_data["no4"]
 			if parsed_code.isdigit():
 				parsed_code_int = int(parsed_code)
 			else:
 				return "incorrect code"
 
+			# If the parsed code match the database verify the email
 			if parsed_code_int == this_user.verification_code:
 				this_user.email_verified = True
 				session.commit()
