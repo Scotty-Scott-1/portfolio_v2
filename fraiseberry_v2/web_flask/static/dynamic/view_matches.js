@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const message = candidate.querySelector(".message")
 
 		bin.addEventListener("click", () =>{
+			// Send form data server side //
 			const id = candidate.querySelector(".not_visable")
 			const form_data = {
 				id: id.textContent,
@@ -34,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		});
 
 		message.addEventListener("click", () => {
+			// Send match ID server side as an arg //
 			const id = candidate.querySelector(".not_visable")
 			const match_id = id.textContent
 			fetch(`/message/?match_id=${match_id}`, {

@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const backButton = document.getElementById("back-button");
 
 	minAge.addEventListener("input" , () => {
+		// Move the max age slider if min age is the same //
 		agevalue.textContent = minAge.value;
 		if(minAge.value > maxAge.value) {
 			maxAge.value = minAge.value;
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function makeRequest() {
+	// Get form data and send server side //
 
 	const form_data = {
 		min_age: document.querySelector('input[name="min_age"]').value,

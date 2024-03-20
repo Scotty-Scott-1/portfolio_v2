@@ -46,11 +46,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 	function showPopover () {
+		// Show the popover//
 		const pop = document.getElementById("popover")
 		if (pop.style.display === "none") {
 			pop.style.display= "block";
 			pop.classList.remove("hidden");
 		}
+		// Hide the popover //
 		else {
 			pop.classList.add("hidden");
 			pop.style.display = "none";

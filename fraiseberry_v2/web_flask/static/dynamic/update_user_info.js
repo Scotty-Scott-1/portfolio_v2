@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function makeRequest() {
+	// Get form data and send server side//
 
 	const form_data = {
 		first_name: document.querySelector('#first_name').value,

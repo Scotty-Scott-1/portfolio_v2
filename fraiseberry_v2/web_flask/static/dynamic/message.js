@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const home = document.getElementById("home");
 	const refreshTime = 2 * 60 * 1000;
 
+	// Adds a class to add styles //
 	dms.forEach(dm => {
 		const senderID = dm.querySelector("#senderID");
 		if (senderID.textContent == varThisUserID.textContent) {
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	});
 
-
+	// Send the message content server side and then refresh the page //
 	send_icons.addEventListener("click", () => {
 		const id = varMatchID.textContent
 
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	const refreshtimer = setTimeout(refresh, refreshTime);
 
+	// Refresh the page after a certain time //
 	function refresh () {
 		window.location.reload();
 	}

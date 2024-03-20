@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function() {
 
 	const video = document.getElementById("vid");
@@ -7,8 +6,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	const save = document.getElementById("save");
 	const back = document.getElementById("back");
 
+	// Hide the canvas until it contains an img//
 	canvas.style.display = "none";
 
+	// Active video //
 	navigator.mediaDevices.getUserMedia({ video: true})
 	.then((stream) => {
 		video.srcObject = stream
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	captureButton.addEventListener("click", () => {
+		// Capture an image from the video //
 		const context = canvas.getContext("2d");
 		context.drawImage(video, 0, 0, canvas.width, canvas.height);
 		image.src = canvas.toDataURL("image/jpeg");
@@ -36,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	save.addEventListener("click", () => {
+		// Send the img server side and then navigate to dashboard
 		fetch("/camera/", {
 			method: "POST",
 			body: JSON.stringify({ImageData: image.src}),

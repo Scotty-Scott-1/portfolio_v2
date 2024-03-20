@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	function show(index) {
+		// Add a like or pass the current canidate//
 		candidates.forEach((candidate, idx) => {
 			if(idx === index) {
 				candidate.classList.add('active')

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const anotherCode = document.getElementById("another_code")
 
 	no1.addEventListener("input", () => {
+		// Add styles when a value is typed //
 		let value = no1.value;
 		if (value == "") {
 			no1.style.borderStyle = "dotted"
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	no2.addEventListener("input", () => {
+		// Add styles when a value is typed //
 		let value = no2.value;
 		if (value == "") {
 			no2.style.borderStyle = "dotted"
@@ -30,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	no3.addEventListener("input", () => {
+		// Add styles when a value is typed //
 		let value = no3.value;
 		if (value == "") {
 			no3.style.borderStyle = "dotted"
@@ -41,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	no4.addEventListener("input", () => {
+		// Add styles when a value is typed //
 		let value = no4.value;
 		if (value == "") {
 			no4.style.borderStyle = "dotted"
@@ -52,12 +56,13 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	anotherCode.addEventListener("click", () => {
+		// Refresh the page//
 		alert("a new code has been sent")
 		window.location.href = "/verify_email/"
 	});
 
 	verifyButton.addEventListener("click", () => {
-
+		// Send form data server side//
 		const form_data = {
 			no1: no1.value,
 			no2: no2.value,

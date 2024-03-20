@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	let longitude;
 	signInButton.addEventListener("click", () => {
 
+		// get the users coordinates //
 		if ("geolocation" in navigator) {
 			navigator.geolocation.getCurrentPosition((postiton) => {
 					latitude = postiton.coords.latitude;
